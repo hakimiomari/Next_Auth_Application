@@ -6,6 +6,8 @@ type AuthContextType = {
   setIsAuth: (isAuth: boolean) => void;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
+  message: string;
+  setMessage: (message: string) => void;
 };
 
 export const AppContext = createContext<AuthContextType>({
@@ -13,6 +15,8 @@ export const AppContext = createContext<AuthContextType>({
   setIsAuth: () => {},
   isLoading: true,
   setIsLoading: () => {},
+  message: '',
+  setMessage: (message: string) => {}
 });
 
 interface AuthProviderProps {
@@ -22,9 +26,10 @@ interface AuthProviderProps {
 export function AppWrapper({ children }: AuthProviderProps) {
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>('');
 
   return (
-    <AppContext.Provider value={{ isAuth, setIsAuth, isLoading, setIsLoading }}>
+    <AppContext.Provider value={{ isAuth, setIsAuth, isLoading, setIsLoading, message, setMessage }}>
       {children}
     </AppContext.Provider>
   );

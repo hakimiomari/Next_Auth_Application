@@ -1,14 +1,43 @@
-'use client'
+"use client";
 import React, { useState } from "react";
+import { userLogin } from "./login";
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
-    
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  
+  const router = useRouter();
 
-  const handleLogin = (event: any) => {
+  const handelLogin = async (event: any) => {
     event.preventDefault();
-    console.log(email, password)
+    const result = userLogin({ email, password });
+
+    if ((await result).success) {
+      setEmailError("");
+      setPasswordError("");
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: (await result).message,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      router.push("/dashboard");
+
+    } else {
+      (await result).message.forEach((error: any) => {
+        if (error.includes("email")) {
+          setEmailError(error);
+        }
+        if (error.includes("Password")) {
+          setPasswordError(error);
+        }
+      });
+    }
   };
 
   return (
@@ -33,7 +62,7 @@ const LoginPage = () => {
             <form
               className="space-y-4 md:space-y-6"
               action="#"
-              onSubmit={(event) => handleLogin(event)}
+              onSubmit={(event) => handelLogin(event)}
             >
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -48,6 +77,7 @@ const LoginPage = () => {
                   className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="name@company.com"
                 />
+                {emailError && <small className="text-red-800">{emailError}</small>}
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -58,10 +88,11 @@ const LoginPage = () => {
                   name="password"
                   id="password"
                   value={password}
-                  onChange={(event)=>setPassword(event.target.value)}
+                  onChange={(event) => setPassword(event.target.value)}
                   placeholder="••••••••"
                   className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 />
+                {passwordError && <small className="text-red-800">{passwordError}</small>}
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-start">
