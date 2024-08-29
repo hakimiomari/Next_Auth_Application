@@ -9,7 +9,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  
+
   const router = useRouter();
 
   const handelLogin = async (event: any) => {
@@ -27,7 +27,6 @@ const LoginPage = () => {
         timer: 1500,
       });
       router.push("/dashboard");
-
     } else {
       (await result).message.forEach((error: any) => {
         if (error.includes("email")) {
@@ -77,7 +76,9 @@ const LoginPage = () => {
                   className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="name@company.com"
                 />
-                {emailError && <small className="text-red-800">{emailError}</small>}
+                {emailError && (
+                  <small className="text-red-800">{emailError}</small>
+                )}
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -92,7 +93,9 @@ const LoginPage = () => {
                   placeholder="••••••••"
                   className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 />
-                {passwordError && <small className="text-red-800">{passwordError}</small>}
+                {passwordError && (
+                  <small className="text-red-800">{passwordError}</small>
+                )}
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-start">
