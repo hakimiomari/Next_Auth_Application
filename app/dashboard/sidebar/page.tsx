@@ -2,7 +2,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { logout } from "@/app/auth/login/login";
+import { logout } from "@/app/api/login";
 
 const SideBar = () => {
   const router = useRouter();

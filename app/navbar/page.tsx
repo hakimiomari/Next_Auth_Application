@@ -17,7 +17,7 @@ const Navbar = () => {
     <div className="py-3 px-6">
       <ul className="flex justify-end gap-4">
         <li
-          onClick={(event) => handleRoute(event, "/auth/login")}
+          onClick={(event) => handleRoute(event, "/auth/register")}
           className="hover:text-blue-500 cursor-pointer"
         >
           Sign up

@@ -1,40 +1,51 @@
 "use client";
 import React, { useState } from "react";
-import { userLogin } from "../../api/login";
-import Swal from "sweetalert2";
+
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 
-const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+import { requiredData } from "@/app/lib/schema";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { registerFunctin } from "../../api/login";
+import Swal from "sweetalert2";
 
+type Inputs = z.infer<typeof requiredData>;
+
+const Register = () => {
   const router = useRouter();
+//   const [data, setData] = useState<Inputs>({
+//     name: "",
+//     email: "",
+//     password: "",
+//   });
 
-  const handelLogin = async (event: any) => {
-    event.preventDefault();
-    const result = userLogin({ email, password });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<Inputs>({
+    resolver: zodResolver(requiredData),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  });
 
-    if ((await result).success) {
-      setEmailError("");
-      setPasswordError("");
-      Swal.fire({
-        position: "top-end",
-        icon: "success",
-        title: (await result).message,
-        showConfirmButton: false,
-        timer: 1500,
-      });
+  const registerUser: SubmitHandler<Inputs> = async (formData) => {
+    const response = await registerFunctin(formData);
+    if (response.success) {
       router.push("/dashboard");
     } else {
-      (await result).message.forEach((error: any) => {
-        if (error.includes("email")) {
-          setEmailError(error);
-        }
-        if (error.includes("Password")) {
-          setPasswordError(error);
-        }
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        title: response.message,
+        showConfirmButton: false,
+        timer: 1500,
       });
     }
   };
@@ -51,33 +62,46 @@ const LoginPage = () => {
             src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg"
             alt="logo"
           />
-          Next Auth
+          Welcome to Next Auth
         </a>
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              Sign in to your account
+              Enter your email and password to register
             </h1>
             <form
               className="space-y-4 md:space-y-6"
               action="#"
-              onSubmit={(event) => handelLogin(event)}
+              onSubmit={handleSubmit(registerUser)}
             >
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  {...register("name")}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="name@company.com"
+                />
+                {errors.name?.message && (
+                  <small className="text-red-800">{errors.name.message}</small>
+                )}
+              </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Your email
                 </label>
                 <input
                   type="email"
-                  name="email"
                   id="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
+                  {...register("email")}
                   className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="name@company.com"
                 />
-                {emailError && (
-                  <small className="text-red-800">{emailError}</small>
+                {errors.email?.message && (
+                  <small className="text-red-800">{errors.email.message}</small>
                 )}
               </div>
               <div>
@@ -86,15 +110,15 @@ const LoginPage = () => {
                 </label>
                 <input
                   type="password"
-                  name="password"
                   id="password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
+                  {...register("password")}
                   placeholder="••••••••"
                   className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 />
-                {passwordError && (
-                  <small className="text-red-800">{passwordError}</small>
+                {errors.password?.message && (
+                  <small className="text-red-800">
+                    {errors.password.message}
+                  </small>
                 )}
               </div>
               <div className="flex items-center justify-between">
@@ -142,5 +166,4 @@ const LoginPage = () => {
     </section>
   );
 };
-
-export default LoginPage;
+export default Register;
