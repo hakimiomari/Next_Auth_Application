@@ -1,10 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import { userLogin } from "../../api/login";
-import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
+import { AppContext } from "@/app/context/store";
+import { useContext } from "react";
 
 const LoginPage = () => {
+  const { setUser } = useContext(AppContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -14,21 +16,15 @@ const LoginPage = () => {
 
   const handelLogin = async (event: any) => {
     event.preventDefault();
-    const result = userLogin({ email, password });
+    const result = await userLogin({ email, password });
 
-    if ((await result).success) {
+    if (result.success) {
       setEmailError("");
       setPasswordError("");
-      Swal.fire({
-        position: "top-end",
-        icon: "success",
-        title: (await result).message,
-        showConfirmButton: false,
-        timer: 1500,
-      });
+      setUser(result.data);
       router.push("/dashboard");
     } else {
-      (await result).message.forEach((error: any) => {
+      result.message.forEach((error: any) => {
         if (error.includes("email")) {
           setEmailError(error);
         }

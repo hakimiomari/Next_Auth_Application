@@ -14,7 +14,7 @@ export const userLogin = async (data: any) => {
       password: data.password,
     });
     cookies().set("access_token", response.data.access_token);
-    return { success: true, message: "Logged in successfully" };
+    return { success: true, data: response.data };
   } catch (error: any) {
     return { success: false, message: error.response?.data?.message };
   }
@@ -45,7 +45,7 @@ export const registerFunctin = async(formData:Inputs) => {
 export const getUsers = async () => {
   const access_token = cookies().get("access_token");
   try {
-    const response = await axios.get(`${appUrl}/user`,{
+    const response = await axios.get(`${appUrl}/users`,{
       headers: {
         Authorization: `Bearer ${access_token?.value}`,
       },
@@ -55,3 +55,13 @@ export const getUsers = async () => {
     return { success: false, message: error.response?.data?.message };
   }
 };
+
+// check coockie
+export const checkCookie = () =>{
+    const access_token = cookies().get('access_token');
+    if(access_token){
+      return { success:true,}
+    } 
+    return { success:false,} 
+
+}

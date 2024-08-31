@@ -9,7 +9,7 @@ const DashboardLayout = ({children}: Readonly<{
       <div className="w-[260px] h-screen">
         <SideBar />
       </div>
-      <div className="p-4 h-screen  ">{children}</div>
+      <div className="mx-12 px-10 py-4 h-screen w-full ">{children}</div>
     </div>
   );
 };

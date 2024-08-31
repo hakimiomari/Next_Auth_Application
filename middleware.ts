@@ -12,6 +12,7 @@ export function middleware(request: NextRequest) {
     "/dashboard/users",
   ];
 
+  console.log(validRoutes.includes(currentRoute));
   if (!access_token && validRoutes.includes(currentRoute)) {
     return NextResponse.redirect(new URL("/", request.url));
   }
