@@ -1,15 +1,23 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { AppContext } from "@/app/context/store";
 import { useContext } from "react";
-import { updateProfile } from "@/app/api/user";
+import { updateProfile, uploadProfile } from "@/app/api/user";
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  profile?: string;
+}
 
 const EditProfile = () => {
-  const { user } =  useContext(AppContext);
+  const { user, setUser } = useContext(AppContext);
 
-  const [image, setImage] = React.useState("");
-  const [name, setName] = React.useState('');
-  const [email, setEmail] = React.useState('');
+  const [image, setImage] = useState<string>("");
+  const [imageFile, setImageFile] = useState("");
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
 
   const handleLabelClick = () => {
     document.getElementById("file-upload")?.click();
@@ -17,25 +25,31 @@ const EditProfile = () => {
 
   const handleImageUpload = (event: any) => {
     const file = event.target.files[0];
+    setImageFile(file); // Set the file for image preview
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result); // Set the image preview
+        setImage(reader?.result as string); // Set the image preview
       };
       reader.readAsDataURL(file); // Read the file as a data URL
     }
   };
 
-  const saveChanges = async(event:any) =>{
+  const saveChanges = async (event: any) => {
     event?.preventDefault();
-    const data = {
-        id:user?.id,
-        name: name ? name : user?.name,
-        email: email ? email : user?.email,
-        profile: image ? image : user?.profile
+    const formData = new FormData();
+
+    if (imageFile) {
+      formData.append("profile", imageFile); // Append the file to the form data
+      const responseProfile = await uploadProfile(formData);
+      if (responseProfile.success) {
+        setUser(responseProfile.data);
+      } else {
+        console.log(responseProfile.message);
+      }
     }
-    const response = await updateProfile(data);
-  }
+    // const response = await updateProfile(formData);
+  };
 
   return (
     <div className="flex h-screen items-center justify-center ">
@@ -43,7 +57,13 @@ const EditProfile = () => {
         <div className="relative">
           <img
             className="mx-auto mb-4 h-32 w-32 rounded-full shadow-lg"
-            src={image ? image: user?.profile}
+            src={
+              image
+                ? image
+                : user?.profile
+                ?  "http://localhost:8001/src/" +user?.profile
+                : "/assets/user/profile.png"
+            }
             alt="profile picture"
           />
           <label
@@ -72,11 +92,13 @@ const EditProfile = () => {
           onChange={(event) => setName(event?.target.value)}
           value={name ? name : user?.name}
         />
-        <input
+       <input
           type="text"
           className="border-gray-500 border rounded-lg w-full text-slate-800 py-1 px-2 mx-2"
           onChange={(event) => setEmail(event?.target.value)}
-          value={email ? email : user?.email}
+          value={
+            email ? email :  user?.email
+          }
         />
         <h2 className="font-semibold text-slate-500 mt-2">UI/UX Designer</h2>
         <span className="inline-block">
@@ -97,7 +119,10 @@ const EditProfile = () => {
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </p>
-        <button onClick={(event) =>saveChanges(event)} className="mt-8 rounded-3xl border-2 border-solid border-violet-900 px-8 py-2 font-semibold uppercase tracking-wide text-violet-900 hover:bg-violet-900 hover:text-white">
+        <button
+          onClick={(event) => saveChanges(event)}
+          className="mt-8 rounded-3xl border-2 border-solid border-violet-900 px-8 py-2 font-semibold uppercase tracking-wide text-violet-900 hover:bg-violet-900 hover:text-white"
+        >
           Save Changes
         </button>
       </div>
